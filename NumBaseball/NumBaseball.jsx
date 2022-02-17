@@ -16,6 +16,22 @@ function getNumbers() {
   console.log(array);
   return array;
 }
+const NumBaseball = () => {
+  return (
+    <>
+      <h1>{result}</h1>
+      <form onSubmit={this.onSubmitForm}>
+        <input maxLength={4} value={value} onChange={this.onChangeInput} />
+      </form>
+      <div>시도: {tries.length}</div>
+      <ul>
+        {tries.map((v, i) => {
+          return <Try key={`${i + 1}차 시도: `} tryInfo={v} index={i} />;
+        })}
+      </ul>
+    </>
+  );
+};
 class NumBaseball extends Component {
   state = {
     result: "",
