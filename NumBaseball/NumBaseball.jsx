@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useRef, useState, memo } from "react";
 import Try from "./Try";
 
 function getNumbers() {
@@ -21,18 +21,20 @@ const NumBaseball = memo(() => {
   const [value, setValue] = useState("");
   const [answer, setAnswer] = useState(getNumbers());
   const [tries, setTries] = useState([]);
+  const inputEl = useRef(null);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
     if (value === answer.join("")) {
-      setResult("홈런!");
       setTries((prevTries) => {
         return [...prevTries, { try: value, result: "홈런!" }];
       });
+      setResult("홈런!");
       alert("게임을 다시 시작합니다");
       setValue("");
       setAnswer(getNumbers());
       setTries([]);
+      inputEl.current.focus();
     } else {
       const answerArray = value.split("").map((v) => parseInt(v));
       let strike = 0;
@@ -43,6 +45,7 @@ const NumBaseball = memo(() => {
         setValue("");
         setAnswer(getNumbers());
         setTries([]);
+        inputEl.current.focus();
       } else {
         for (let i = 0; i < 4; i += 1) {
           if (answerArray[i] === answer[i]) {
@@ -69,7 +72,12 @@ const NumBaseball = memo(() => {
     <>
       <h1>{result}</h1>
       <form onSubmit={onSubmitForm}>
-        <input maxLength={4} value={value} onChange={onChangeInput} />
+        <input
+          ref={inputEl}
+          maxLength={4}
+          value={value}
+          onChange={onChangeInput}
+        />
       </form>
       <div>시도: {tries.length}</div>
       <ul>
