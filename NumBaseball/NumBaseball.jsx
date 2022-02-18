@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import Try from "./Try";
 
 function getNumbers() {
@@ -16,7 +16,7 @@ function getNumbers() {
   console.log(array);
   return array;
 }
-const NumBaseball = () => {
+const NumBaseball = memo(() => {
   const [result, setResult] = useState("");
   const [value, setValue] = useState("");
   const [answer, setAnswer] = useState(getNumbers());
@@ -79,6 +79,6 @@ const NumBaseball = () => {
       </ul>
     </>
   );
-};
+});
 
 export default NumBaseball;
