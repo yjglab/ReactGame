@@ -1,72 +1,57 @@
-import React, { PureComponent } from "react";
+import React, { useState, useRef } from "react";
 
-class SpeedTest extends PureComponent {
-  state = {
-    state: "waiting", // 이건 react 상태 아님
-    message: "클릭해서 시작하세요",
-    result: [],
-  };
-  timeout;
-  startTime;
-  endTime;
-  onClickScreen = () => {
-    const { state, message, result } = this.state;
+const SpeedTest = () => {
+  const [state, setState] = useState("waiting");
+  const [message, setMessage] = useState("클릭하여 시작");
+  const [result, setResult] = useState([]);
+  const timeout = useRef(null);
+  let startTime = useRef();
+  let endTime = useRef();
+
+  const onClickScreen = () => {
     if (state === "waiting") {
-      this.setState({
-        state: "ready",
-        message: "초록색이 되면 클릭",
-      });
-      this.timeout = setTimeout(() => {
-        this.setState({
-          state: "now",
-          message: "지금 클릭",
-        });
-        this.startTime = new Date();
+      setState("ready");
+      setMessage("초록색이되면클릭");
+      timeout.current = setTimeout(() => {
+        setState("now");
+        setMessage("지금클릭");
+        startTime.current = new Date();
       }, Math.floor(Math.random() * 1000) + 2000);
     } else if (state === "ready") {
-      clearTimeout(this.timeout);
-      this.setState({
-        state: "waiting",
-        message: "실패!",
-      });
+      clearTimeout(timeout.current);
+      setState("waiting");
+      setMessage("실패");
     } else if (state === "now") {
-      this.endTime = new Date();
-      this.setState((prevState) => {
-        return {
-          state: "waiting",
-          message: "클릭해서 시작하세요",
-          result: [...prevState.result, this.endTime - this.startTime],
-        };
+      endTime.current = new Date();
+      setState("waiting");
+      setMessage("클릭해서 시작하세요");
+      setResult((prevResult) => {
+        return [...prevResult, endTime.current - startTime.current];
       });
     }
   };
-  onReset = () => {
-    this.setState({
-      result: [],
-    });
+  const onReset = () => {
+    setResult([]);
   };
-  renderAverage = () => {
-    const { result } = this.state;
+  const renderAverage = () => {
     return result.length === 0 ? null : (
       <>
         <div>
           평균시간: {result.reduce((a, c) => a + c) / result.length}
           ms
         </div>
-        <button onClick={this.onReset}>리셋</button>
+        <button onClick={onReset}>리셋</button>
       </>
     );
   };
-  render() {
-    const { state, message } = this.state;
-    return (
-      <>
-        <div id="screen" className={state} onClick={this.onClickScreen}>
-          {message}
-        </div>
-        <div>{this.renderAverage()}</div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div id="screen" className={state} onClick={onClickScreen}>
+        {message}
+      </div>
+      <div>{renderAverage()}</div>
+    </>
+  );
+};
+
 export default SpeedTest;
