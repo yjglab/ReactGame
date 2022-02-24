@@ -37,7 +37,6 @@ const getTdStyle = (code) => {
   }
 };
 const getTdText = (code) => {
-  console.log("getTdText");
   switch (code) {
     case CODE.NORMAL:
       return "";
@@ -53,7 +52,7 @@ const getTdText = (code) => {
       return "?";
 
     default:
-      return "";
+      return code || "";
   }
 };
 
