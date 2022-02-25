@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, memo, useMemo } from "react";
 import {
   CODE,
   OPEN_CELL,
@@ -56,7 +56,7 @@ const getTdText = (code) => {
   }
 };
 
-const Td = ({ rowIndex, cellIndex }) => {
+const Td = memo(({ rowIndex, cellIndex }) => {
   const { tableData, dispatch, halted } = useContext(TableContext);
 
   const onClickTd = useCallback(() => {
@@ -101,14 +101,16 @@ const Td = ({ rowIndex, cellIndex }) => {
     },
     [tableData[rowIndex][cellIndex], halted]
   );
-  return (
+  return useMemo(() => {
     <td
       style={getTdStyle(tableData[rowIndex][cellIndex])}
       onClick={onClickTd}
       onContextMenu={onRightClickTd}
     >
       {getTdText(tableData[rowIndex][cellIndex])}
-    </td>
-  );
-};
+    </td>;
+  }, [tableData[rowIndex][cellIndex]]);
+  // 함수는 여러번 실행되지만 컴포넌트 렌더링은 클릭당 한번만 됨
+});
+
 export default Td;

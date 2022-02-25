@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useMemo } from "react";
+import React, { useReducer, createContext, useMemo, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
 
@@ -50,9 +50,15 @@ export const TableContext = createContext({
 
 const initialState = {
   tableData: [],
+  data: {
+    row: 0,
+    cell: 0,
+    mine: 0,
+  },
   timer: 0,
   result: "",
   halted: true,
+  openedCount: 0,
 };
 export const START_GAME = "START_GAME";
 export const OPEN_CELL = "OPEN_CELL";
@@ -60,12 +66,19 @@ export const CLICK_MINE = "CLICK_MINE";
 export const FLAG_CELL = "FLAG_CELL";
 export const QUESTION_CELL = "QUESTION_CELL";
 export const NORMALIZE_CELL = "NORMALIZE_CELL";
+export const INCREMENT_TIMER = "INCREMENT_TIMER";
 
 const reducer = (state, action) => {
   switch (action.type) {
     case START_GAME:
       return {
         ...state,
+        data: {
+          row: action.row,
+          cell: action.cell,
+          mine: action.mine,
+        },
+        openedCount: 0,
         tableData: plantMine(action.row, action.cell, action.mine),
         halted: false,
       };
@@ -75,6 +88,7 @@ const reducer = (state, action) => {
         tableData[i] = [...state.tableData[i]];
       });
       const checked = [];
+      let openedCount = 0;
       const checkAround = (row, cell) => {
         if (
           [
@@ -100,6 +114,7 @@ const reducer = (state, action) => {
         } else {
           checked.push(row + "," + cell);
         }
+
         let around = [];
         if (tableData[row - 1]) {
           around = around.concat(
@@ -143,12 +158,27 @@ const reducer = (state, action) => {
             }
           });
         }
+        if (tableData[row][cell] === CODE.NORMAL) {
+          openedCount += 1;
+        }
         tableData[row][cell] = count;
       };
       checkAround(action.row, action.cell);
+      let halted = false;
+      let result = `${state.timer}초 만에 성공`;
+      if (
+        state.data.row * state.data.cell - state.data.mine ===
+        state.openedCount + openedCount
+      ) {
+        halted = true;
+        result = "승리";
+      }
       return {
         ...state,
         tableData,
+        openedCount: state.openedCount + openedCount,
+        halted,
+        result,
       };
     }
     case CLICK_MINE:
@@ -199,6 +229,12 @@ const reducer = (state, action) => {
         tableData,
       };
     }
+    case INCREMENT_TIMER: {
+      return {
+        ...state,
+        timer: state.timer + 1,
+      };
+    }
     default:
       return state;
   }
@@ -214,6 +250,19 @@ const Mine = () => {
     }),
     [tableData, halted]
   );
+  useEffect(() => {
+    let timer;
+    if (halted === false) {
+      timer = setInterval(() => {
+        console.log("ff");
+        dispatch({ type: INCREMENT_TIMER });
+      }, 1000);
+    }
+    return () => {
+      console.log("clear");
+      clearInterval(timer);
+    };
+  }, [halted]);
   return (
     <TableContext.Provider value={value}>
       <Form />
