@@ -6,25 +6,25 @@ import {
   HashRouter,
   Link,
 } from "react-router-dom";
-import NumBaseball from "../NumBaseball/NumBaseball_class";
-import Rsp from "../rsp/Rsp_class";
-import Lotto from "../Lotto/Lotto_class";
+
+import GameMatcher from "./GameMatcher";
 
 const Games = () => {
   return (
     <BrowserRouter>
       <div>
-        <Link to="/numBaseball">숫자야구</Link>
+        <Link to="/game/numBaseball">숫자야구</Link>
         &nbsp;
-        <Link to="/rsp">RSP</Link>
+        <Link to="/game/rsp">RSP</Link>
         &nbsp;
-        <Link to="/lotto">로또</Link>
+        <Link to="/game/lotto">로또</Link>
+        &nbsp;
+        <Link to="/game/index">게임 매쳐</Link>
       </div>
       <div>
         <Routes>
-          <Route path="/numbaseball" element={<NumBaseball />} />
-          <Route path="/rsp" element={<Rsp />} />
-          <Route path="/lotto" element={<Lotto />} />
+          <Route path="/" element={<GameMatcher />} />
+          <Route path="/game/:name" element={<GameMatcher />} />
         </Routes>
       </div>
     </BrowserRouter>
